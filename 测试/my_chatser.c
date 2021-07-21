@@ -23,7 +23,7 @@
 #define buffersize   1024
 
 //用户的唯一标识
-long acount_number = 1230;
+long acount_number = 1237;
 int account_group = 131;
 
 
@@ -679,7 +679,7 @@ sign_up(void *arg)
     struct sign_up si = *(struct sign_up*)arg;
     while(sign_up_flag==0)
     pthread_cond_signal(&sign_cond);
-    sign_up_flag = 1;
+    sign_up_flag = 0;
     pthread_detach(pthread_self());
     pthread_detach(si.pth);
     char buf[1024];

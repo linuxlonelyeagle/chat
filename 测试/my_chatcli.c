@@ -394,7 +394,7 @@ deliver_file(int connfd)
     scanf("%s",recv_account);
     while(getchar()!='\n')
         ;
-    printf("请输入你传入的文件的路径:");
+    printf("请输入你传入的文件名字:");
     fflush(stdout);
     scanf("%s",path);
     while(getchar()!='\n')
@@ -805,7 +805,6 @@ find_function(int fd,char *str)
             printf("帐号登陆失败\n");
         }
         pthread_cond_broadcast(&sign_in_cond);
-        printf("登陆结束\n");
     }
     else if(strcmp(buf,"sign_up")==0)
     {
@@ -1063,7 +1062,7 @@ find_function(int fd,char *str)
             next = cJSON_GetObjectItem(item,"path");
             strcpy(name,next->valuestring);
             printf("帐号为:%s 给你发来 %s 文件\n",account,name);
-            FILE *fp=fopen("发来的文件","w");
+            FILE *fp=fopen(name,"w");
             while(recv(fd,buf,1024,0))
             {
                 if(strcmp(buf,"NULL")==0)
@@ -1219,12 +1218,14 @@ sign_up(int fd)
    char answer[256];
    while(1)
    {
-        printf("请输入你的密码:");
+       system("stty -echo");
+        printf("请输入你的密码:\n");
         scanf("%s",passwd1);
         while(getchar()!='\n')
             ;
-        printf("请再次输入你的密码:");
+        printf("请再次输入你的密码:\n");
         scanf("%s",passwd2);
+        system("stty echo");
         while(getchar()!='\n')
             ;
 
@@ -1237,6 +1238,7 @@ sign_up(int fd)
             sprintf(buf,"{\"sign_up\":{\"name\":\"%s\",\"password\":\"%s\",\"question\":\"%s\",\"answer\":\"%s\"}}",name,passwd1,question,answer);
             if(send(fd,buf,156,0)<0)
             my_err("send",__LINE__);
+            printf("你的密码是:%s\n",passwd1);
             while(getchar()!='\n');
             return 0;
         }
@@ -1297,10 +1299,12 @@ sign_in(int connfd)
     char buf[1024];
     char id[30];
     char passwd[30];
-    printf("输入你的id:");
+    printf("输入你的帐号:");
     scanf("%s",id);
-    printf("输入你的密码:");
+    printf("输入你的密码:\n");
+    system("stty -echo");
     scanf("%s",passwd);
+    system("stty echo");
     while(getchar()!='\n')
         ;
     sprintf(buf,"{\"sign_in\":{\"id\":\"%s\",\"passwd\":\"%s\"}}",id,passwd);
