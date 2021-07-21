@@ -1089,20 +1089,20 @@ find_function(int fd,char *str)
             cJSON *next = NULL;
             root = cJSON_Parse(str);
             item = cJSON_GetObjectItem(root,"find_back");
-            if(strcmp(item->valuestring,"null")==0)
-            {
-                printf("该用户不存在\n");
-            while(find_back_flag == 0)
-                pthread_cond_signal(&find_back_cond);
-            find_back_flag = 0;
-            return ;
-            }
             next = cJSON_GetObjectItem(item,"question");
             strcpy(question,next->valuestring);
             next = cJSON_GetObjectItem(item,"answer");
             strcpy(answer,next->valuestring);
             next = cJSON_GetObjectItem(item,"password");
             strcpy(passwd,next->valuestring);
+            if(strcmp(question,"null")==0)
+            {
+                printf("该用户不存在\n");
+                while(find_back_flag == 0)
+                    pthread_cond_signal(&find_back_cond);
+                find_back_flag = 0;
+                return ;
+            }
             printf("你的密保问题:%s\n",question);
             printf("请输入你的答案:");
             fflush(stdout);
@@ -1116,7 +1116,7 @@ find_function(int fd,char *str)
             }
             else 
             {
-                printf("输入的答案错误");
+                printf("输入的答案错误\n");
                 fflush(stdout);
             }
             while(find_back_flag == 0)
@@ -1304,7 +1304,6 @@ sign_in(int connfd)
     while(getchar()!='\n')
         ;
     sprintf(buf,"{\"sign_in\":{\"id\":\"%s\",\"passwd\":\"%s\"}}",id,passwd);
-    printf("%s\n",buf);
     send(connfd,buf,1024,0);
     
 }

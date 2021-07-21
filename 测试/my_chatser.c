@@ -590,7 +590,7 @@ find_back(void *arg)
     printf("row = %d\n",row);
     if(row == NULL)
     {
-        sprintf(buf,"{\"find_back\":\"null\"}");
+        sprintf(buf,"{\"find_back\":{\"question\":\"null\",\"answer\":\"null\",\"password\":\"null\"}}");
         send(a.connfd,buf,1024,0);
         return 0;
     }
