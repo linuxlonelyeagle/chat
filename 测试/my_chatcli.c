@@ -745,7 +745,6 @@ pthread(void *arg)
            if(events[i].events&EPOLLIN)
            {
                 recv(fd,buf,1024,0);
-                printf("%s\n",buf);
                 find_function(fd,buf);
                 pthread_cond_signal(&my_chat_cond);
            }
@@ -1178,11 +1177,15 @@ find_function(int fd,char *str)
                 printf("接受文件完成\n");
             }
         }
+        else 
+        {
+            fwrite(str,1,1024,fp);
+            printf("%s\n",str);
+        }
     }
     else
     {
         fwrite(str,1,1024,fp);
-        printf("%s",str);
     }
 }
 
