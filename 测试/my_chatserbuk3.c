@@ -24,8 +24,7 @@ int  globe_listen;
 #define MAXEVENTS 64
 #define buffersize   1024
 
-
-
+ 
 int efd; 
 struct epoll_event event;
 struct epoll_event *events=NULL;
@@ -1130,16 +1129,19 @@ find_function(int connfd,char *str)
             write_log("打卡文件失败");
             return 0;
         }
-        while(recv(connfd,buf,1024,0)>0)
+        while(recv(connfd,buf,1024,0)==1024)
         {
             if (strcmp(buf,"null")==0)
             {
                fclose(fp);
                break;
             }
-            fwrite(buf,1,1024,fp);
+            else
+            {
+             fwrite(buf,1,1024,fp); 
+            }
         }
-
+        fclose(fp);
         del_fil.connfd = connfd;
         strcpy(del_fil.buf,str);
         pthread_create(&del_fil.pth,NULL,deliver_file,NULL);
@@ -1269,7 +1271,7 @@ deliver_file(void *arg)
     printf("%s\n",buf);
     sem_wait(&sem);
     while(mysql_query(&mysql,buf))
-        printf("hello worlddasdasd\n");
+        ;
     res = mysql_store_result(&mysql);
     sem_post(&sem);
     row = mysql_fetch_row(res);
@@ -2337,8 +2339,7 @@ delete_group(void*arg)
     //删除群聊天记录
     sprintf(cmd,"delete from group_chat_message where  group_account = \"%s\"",group_account);
     sem_wait(&sem);
-    while(mysql_query(&mysql,cmd))
-        ;
+    mysql_query(&mysql,cmd);
     sem_post(&sem);
     //删除群
     sprintf(cmd,"delete from group_members where group_account = \"%s\"",group_account);
@@ -2346,7 +2347,7 @@ delete_group(void*arg)
     while(mysql_query(&mysql,cmd))
         ;
     sem_post(&sem);
-    sprintf(cmd,"{\"delete_fri\":\"删除成功\"}");
+    sprintf(cmd,"{\"delete_group\":\"删除成功\"}");
     sem_wait(&send_sem);
     send(temp.connfd,cmd,1024,0);
     sem_post(&send_sem);
@@ -2738,7 +2739,7 @@ private_chat(void*arg)
         {
             sprintf(cmd,"{\"pri_chat_find\":\"你已经被对方拉黑了\"}");
             sem_wait(&send_sem);
-            send(temp.connfd,buf,1024,0);
+            send(temp.connfd,cmd,1024,0);
             sem_post(&send_sem);
             sprintf(cmd,"私聊，但是已经被拉黑");
             write_log(cmd);
